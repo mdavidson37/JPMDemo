@@ -7,20 +7,9 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.joda.time.DateTime;
 
-/* Sample data represents the instructions sent by various clients to JP Morgan to execute in the international
-market.
-Entity Buy/Sell AgreedFx Currency InstructionDate SettlementDate Units Price per unit
-foo B 0.50 SGP 01 Jan 2016 02 Jan 2016 200 100.25
-bar S 0.22 AED 05 Jan 2016 07 Jan 2016 450 150.5
-
- A work week starts Monday and ends Friday, unless the currency of the trade is AED or SAR, where
-the work week starts Sunday and ends Thursday. No other holidays to be taken into account.
- A trade can only be settled on a working day.
- If an instructed settlement date falls on a weekend, then the settlement date should be changed to
-the next working day.
- USD amount of a trade = Price per unit * Units * Agreed Fx
-*/
-
+// Where a settlement day is not a working day it is autiomatically adjusted to the enxt working day
+// getValue returns the value in USD. For the purpose of the exercise I assume that to convert from
+// the chose currency to USD you multiply by the agreedFx (ie it is local->USD rate)
 public class Instruction {
 
 	private final String			entity;

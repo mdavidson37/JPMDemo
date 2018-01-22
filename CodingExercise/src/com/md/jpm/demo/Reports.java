@@ -3,15 +3,19 @@ package com.md.jpm.demo;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.joda.time.DateTime;
 
+// Tgis report assumes that each entity generates a single transaction per day.
 public class Reports {
 
 	List<Instruction> instructions;
@@ -26,16 +30,16 @@ public class Reports {
 		Map<DateTime, BigDecimal> incomingDailyTotal = new TreeMap<>();
 		Map<DateTime, BigDecimal> outgoingDailyTotal = new TreeMap<>();
 
-		Set<Instruction> incomingRanked = new TreeSet<>(new TransationValueComparator());
-		Set<Instruction> outgoingRanked = new TreeSet<>(new TransationValueComparator());
+		Map<String, BigDecimal> incomingRanked = new TreeMap<>();
+		Map<String, BigDecimal> outgoingRanked = new TreeMap<>();
 
 		for (Instruction instruction : instructions) {
 			if (instruction.getType() == InstructionType.BUY) {
 				addToDailyTotal(outgoingDailyTotal, instruction);
-				outgoingRanked.add(instruction);
+				addToEntityTotal(outgoingRanked, instruction);
 			} else {
 				addToDailyTotal(incomingDailyTotal, instruction);
-				incomingRanked.add(instruction);
+				addToEntityTotal(incomingRanked, instruction);
 			}
 		}
 
@@ -58,44 +62,45 @@ public class Reports {
 
 	}
 
+	private void addToEntityTotal(Map<String, BigDecimal> total, Instruction instruction) {
+		if (!total.containsKey(instruction.getEntity())) {
+			total.put(instruction.getEntity(), new BigDecimal(0));
+		}
+
+		BigDecimal transationValue = instruction.getVaue();
+
+		BigDecimal currentValue = total.get(instruction.getEntity());
+		currentValue = currentValue.add(transationValue);
+
+		total.put(instruction.getEntity(), currentValue);
+
+	}
+
 	private void addToDailyTotal(Map<DateTime, BigDecimal> total, Instruction instruction) {
 		if (!total.containsKey(instruction.getSettlementDate())) {
 			total.put(instruction.getSettlementDate(), new BigDecimal(0));
 		}
 
 		BigDecimal transationValue = instruction.getVaue();
-	
+
 		BigDecimal currentValue = total.get(instruction.getSettlementDate());
 		currentValue = currentValue.add(transationValue);
-	
+
 		total.put(instruction.getSettlementDate(), currentValue);
 
-		total.get(instruction.getSettlementDate());
-		
 	}
 
 	private void printDailyTotals(Map<DateTime, BigDecimal> totals) {
 		for (Entry<DateTime, BigDecimal> entry : totals.entrySet()) {
-			System.out.println(String.format("%tD :: %f", entry.getKey().toDate(), entry.getValue()));
+			System.out.println(String.format("%tD :: %.2f", entry.getKey().toDate(), entry.getValue()));
 		}
 
 	}
 
-	private void printRanking(Set<Instruction> outgoingValues) {
-		int rank = 0;
-		for (Instruction instruction : outgoingValues) {
-			System.out.println(String.format("%d: %s :: %f", rank++, instruction.getEntity(), instruction.getVaue()));
-		}
-
+	private void printRanking(Map<String, BigDecimal> values) {
+		
+		values.entrySet().stream().sorted((f1, f2) -> f2.getValue().compareTo(f1.getValue())).forEach( entry -> System.out.println(String.format("%10s :: %.2f", entry.getKey(), entry.getValue())) );
 	}
 
-	private static class TransationValueComparator implements Comparator<Instruction> {
-
-		@Override
-		public int compare(Instruction o1, Instruction o2) {
-			return o2.getVaue().compareTo(o1.getVaue());
-		}
-
-	}
 
 }
