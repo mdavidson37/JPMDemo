@@ -23,7 +23,7 @@ public class Instruction {
 
 	public Instruction(String entity, InstructionType type, BigDecimal agreedFx, String currency,
 			DateTime instructionDate, DateTime settlementDate, long units, BigDecimal pricePerUnit) {
-		
+
 		Validate.notEmpty(entity);
 		Validate.notNull(agreedFx);
 		Validate.isTrue(agreedFx.compareTo(BigDecimal.ZERO) > 0);
@@ -33,19 +33,18 @@ public class Instruction {
 		Validate.isTrue(units > 0);
 		Validate.notNull(pricePerUnit);
 		Validate.isTrue(pricePerUnit.compareTo(BigDecimal.ZERO) > 0);
-		
-		//Validate that settlementday is on a weekday
-	   settlementDate = WorkingDays.getNextWorkingDay(currency, settlementDate);
-		
-		
-		this.entity          = entity;
-		this.type            = type;
-		this.agreedFx        = agreedFx;
-		this.currency        = currency;
+
+		// Validate that settlementday is on a weekday
+		settlementDate = WorkingDays.getNextWorkingDay(currency, settlementDate);
+
+		this.entity = entity;
+		this.type = type;
+		this.agreedFx = agreedFx;
+		this.currency = currency;
 		this.instructionDate = instructionDate;
-		settlementData       = settlementDate;
-		this.units           = units;
-		this.pricePerUnit    = pricePerUnit;
+		settlementData = settlementDate;
+		this.units = units;
+		this.pricePerUnit = pricePerUnit;
 
 	}
 
@@ -80,7 +79,7 @@ public class Instruction {
 	public BigDecimal getPricePerUnit() {
 		return pricePerUnit;
 	}
-	
+
 	public BigDecimal getVaue() {
 		BigDecimal valuePreFx = pricePerUnit.multiply(BigDecimal.valueOf(units));
 		return valuePreFx.multiply(agreedFx);

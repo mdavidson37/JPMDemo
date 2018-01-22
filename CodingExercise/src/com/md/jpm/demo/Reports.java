@@ -98,9 +98,9 @@ public class Reports {
 	}
 
 	private void printRanking(Map<String, BigDecimal> values) {
-		
-		values.entrySet().stream().sorted((f1, f2) -> f2.getValue().compareTo(f1.getValue())).forEach( entry -> System.out.println(String.format("%10s :: %.2f", entry.getKey(), entry.getValue())) );
-	}
 
+		values.entrySet().stream().sorted((f1, f2) -> f2.getValue().compareTo(f1.getValue()))
+				.forEach(entry -> System.out.println(String.format("%10s :: %.2f", entry.getKey(), entry.getValue())));
+	}
 
 }
